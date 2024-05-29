@@ -38,6 +38,7 @@ services:
       - ${APP_PORT}:3000
     volumes:
       - ./src:/app/src
+      - ./test:/app/test
       - ./node_modules:/node_modules
     depends_on:
       - database
