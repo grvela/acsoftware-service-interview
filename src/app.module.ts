@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TaskModule } from './modules/task/task.module';
-
-//TODO - Verify if port and host are same as .env for container to connect from external
+import { Task } from './modules/task/entities/task.entity';
 
 @Module({
   imports: [
@@ -19,7 +18,8 @@ import { TaskModule } from './modules/task/task.module';
         password: config.get('MYSQL_PASSWORD'),
         database: config.get('MYSQL_DATABASE'),
         port: 3306,
-        entities: [],
+        entities: [Task],
+        synchronize: true
       }),
       inject: [ConfigService]
     }),
