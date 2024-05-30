@@ -1,9 +1,10 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { CreateTaskDto } from '../src/modules/task/dto/create-task.dto';
 import { TaskStatus, TaskPriority } from '../src/modules/task/dto/task.enum';
+import { response } from 'express';
 
 describe('Tasks API (e2e)', () => {
   let app: INestApplication;
@@ -14,6 +15,7 @@ describe('Tasks API (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 
@@ -22,7 +24,7 @@ describe('Tasks API (e2e)', () => {
   });
 
   describe('/task (POST)', () => {
-    it('Create a task', () => {
+    it('Create a task', async () => {
       return request(app.getHttpServer())
         .post('/task')
         .send({
@@ -43,7 +45,7 @@ describe('Tasks API (e2e)', () => {
         });
     });
   
-    it('Create a task only with title and description', () => {
+    it('Create a task only with title and description', async () => {
       return request(app.getHttpServer())
         .post('/task')
         .send({
@@ -63,18 +65,20 @@ describe('Tasks API (e2e)', () => {
     });
 
     it('Should return 400 if title is missing', async () => {
+      
       const createTaskDto = {
         description: 'Task description',
         status: 'to-do',
         priority: 'low',
       };
 
-      const response = await request(app.getHttpServer())
+      return request(app.getHttpServer())
         .post('/task')
         .send(createTaskDto)
-        .expect(400);
-
-      expect(response.body.message).toContain('title should not be empty');
+        .expect(400)
+        .then(response => {
+          expect(response.body.message).toContain("title should not be empty");
+        });
     });
 
     it('Should return 400 if description is missing', async () => {
@@ -105,7 +109,7 @@ describe('Tasks API (e2e)', () => {
         .send(createTaskDto)
         .expect(400);
 
-      expect(response.body.message).toContain('status must be a valid enum value');
+      expect(response.body.message).toContain('status must be one of the following values: to-do, in-progress, done');
     });
 
     it('Should return 400 if priority is invalid', async () => {
@@ -121,7 +125,7 @@ describe('Tasks API (e2e)', () => {
         .send(createTaskDto)
         .expect(400);
 
-      expect(response.body.message).toContain('priority must be a valid enum value');
+      expect(response.body.message).toContain('priority must be one of the following values: low, medium, high');
     });
   });
 

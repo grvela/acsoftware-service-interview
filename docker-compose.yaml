@@ -11,6 +11,20 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     networks:
       - acsoftware-network
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${APP_PORT}:3000
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+      - ./node_modules:/node_modules
+    depends_on:
+      - database
+    networks:
+      - acsoftware-network
 #  keycloak:
 #    image: quay.io/keycloak/keycloak:24.0.1
 #    ports:
@@ -30,20 +44,6 @@ services:
 #      - MINIO_ROOT_USER=${MINIO_USER}
 #      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
 #    command: server /data --console-address ":9001"
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - ${APP_PORT}:3000
-    volumes:
-      - ./src:/app/src
-      - ./test:/app/test
-      - ./node_modules:/node_modules
-    depends_on:
-      - database
-    networks:
-      - acsoftware-network
 
 networks:
   acsoftware-network:
