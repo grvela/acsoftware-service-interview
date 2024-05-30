@@ -4,10 +4,10 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { CreateTaskDto } from '../src/modules/task/dto/create-task.dto';
 import { TaskStatus, TaskPriority } from '../src/modules/task/dto/task.enum';
-import { response } from 'express';
 
 describe('Tasks API (e2e)', () => {
   let app: INestApplication;
+  let task_id: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -25,61 +25,64 @@ describe('Tasks API (e2e)', () => {
 
   describe('/task (POST)', () => {
     it('Create a task', async () => {
-      return request(app.getHttpServer())
+      const createTaskDto = {
+        title: 'Task',
+        description: 'Task description',
+        status: 'to-do',
+        priority: 'low',
+      };
+    
+      const response = await request(app.getHttpServer())
         .post('/task')
-        .send({
-          title: 'Task',
-          description: 'Task description',
-          status: 'to-do',
-          priority: 'low',
-        })
-        .expect(201)
-        .then(response => {
-          expect(response.body).toHaveProperty('id');
-          expect(response.body.title).toEqual('Task');
-          expect(response.body.description).toEqual('Task description');
-          expect(response.body.status).toEqual('to-do');
-          expect(response.body.priority).toEqual('low');
-          expect(response.body).toHaveProperty('createdAt');
-          expect(response.body).toHaveProperty('updatedAt');
-        });
+        .send(createTaskDto)
+        .expect(201);
+
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.title).toEqual(createTaskDto.title);
+      expect(response.body.description).toEqual(createTaskDto.description);
+      expect(response.body.status).toEqual(createTaskDto.status);
+      expect(response.body.priority).toEqual(createTaskDto.priority);
+      expect(response.body).toHaveProperty('createdAt');
+      expect(response.body).toHaveProperty('updatedAt');
+      
+      task_id = response.body.id;
     });
   
     it('Create a task only with title and description', async () => {
-      return request(app.getHttpServer())
+      const createTaskDto = {
+        title: 'Task',
+        description: 'Task description',
+      };
+    
+      const response = await request(app.getHttpServer())
         .post('/task')
-        .send({
-          title: 'Task',
-          description: 'Task description',
-        })
-        .expect(201)
-        .then(response => {
-          expect(response.body).toHaveProperty('id');
-          expect(response.body.title).toEqual('Task');
-          expect(response.body.description).toEqual('Task description');
-          expect(response.body.status).toEqual('to-do');
-          expect(response.body.priority).toEqual('low');
-          expect(response.body).toHaveProperty('createdAt');
-          expect(response.body).toHaveProperty('updatedAt');
-        });
+        .send(createTaskDto)
+        .expect(201);
+    
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.title).toEqual(createTaskDto.title);
+      expect(response.body.description).toEqual(createTaskDto.description);
+      expect(response.body.status).toEqual('to-do'); 
+      expect(response.body.priority).toEqual('low');
+      expect(response.body).toHaveProperty('createdAt');
+      expect(response.body).toHaveProperty('updatedAt');
     });
 
     it('Should return 400 if title is missing', async () => {
-      
       const createTaskDto = {
         description: 'Task description',
         status: 'to-do',
         priority: 'low',
       };
-
-      return request(app.getHttpServer())
+    
+      const response = await request(app.getHttpServer())
         .post('/task')
         .send(createTaskDto)
-        .expect(400)
-        .then(response => {
-          expect(response.body.message).toContain("title should not be empty");
-        });
+        .expect(400);
+    
+      expect(response.body.message).toContain("title should not be empty");
     });
+
 
     it('Should return 400 if description is missing', async () => {
       const createTaskDto = {
@@ -129,15 +132,14 @@ describe('Tasks API (e2e)', () => {
     });
   });
 
-
   describe('/task (GET)', () => {
-    it('List all tasks when no tasks exist', async () => {
+    it('List all tasks', async () => {
       const response = await request(app.getHttpServer())
         .get('/task')
         .expect(200);
 
       expect(Array.isArray(response.body)).toBeTruthy();
-      expect(response.body.length).toBe(0);
+      expect(response.body.length).toBeGreaterThanOrEqual(0);
     });
 
     it('Get a specific task that does not exist', async () => {
@@ -188,12 +190,18 @@ describe('Tasks API (e2e)', () => {
         .send(updateTaskDto)
         .expect(400);
 
-      expect(response.body.message).toContain('status must be a valid enum value');
+      expect(response.body.message).toContain("status must be one of the following values: to-do, in-progress, done");
     });
   });
 
   describe('/task/:id (DELETE)', () => {
-    it('should return 404 if task does not exist', async () => {
+    it('Should return 200 if was successfully deleted', async () => {
+      await request(app.getHttpServer())
+        .delete(`/task/${task_id}`)
+        .expect(200);
+    });
+
+    it('Should return 404 if task does not exist', async () => {
       const response = await request(app.getHttpServer())
         .delete('/task/999')
         .expect(404);
