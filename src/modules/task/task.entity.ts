@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
-import { TaskStatus, TaskPriority } from '../dto/task.enum';
+import { TaskStatus, TaskPriority } from './dto/task.enum';
   
 @Entity()
 export class Task {
