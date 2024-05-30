@@ -3,6 +3,7 @@ import { CredentialsDto } from './ credentials.dto';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { KeycloakClientService } from '../client/client.service';
+import { emit } from 'process';
 
 @Injectable()
 export class KeycloakAuthService {
@@ -14,6 +15,9 @@ export class KeycloakAuthService {
   async login(credentials: CredentialsDto) {
     const { email, password } = credentials;
 
+    console.log(email);
+    console.log(password);
+
     const endpoint = `${this.client.server}/realms/${this.client.realm}/protocol/openid-connect/token`;
 
     const { data } = await firstValueFrom(
@@ -23,7 +27,7 @@ export class KeycloakAuthService {
           client_id: this.client.client_id,
           client_secret: this.client.client_secret,
           grant_type: 'password',
-          email,
+          username: email,
           password,
         }),
       ),
