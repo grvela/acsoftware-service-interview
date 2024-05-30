@@ -4,6 +4,48 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { CreateTaskDto } from '../src/modules/task/dto/create-task.dto';
 import { TaskStatus, TaskPriority } from '../src/modules/task/dto/task.enum';
+import { CreateUserDTO } from 'src/modules/users/create-user.dto';
+import { response } from 'express';
+
+describe('User API (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe('/user (POST)', () => {
+    it('Create a user', async () => {
+      const user: CreateUserDTO = {
+        name: 'User',
+        email: 'user@name.com',
+        password: 'password'
+      }
+
+      const response = await request(app.getHttpServer())
+        .post('/user')
+        .send(user)
+        .expect(201);
+      
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.name).toBe('User');
+      expect(response.body.email).toBe('user@name.com');
+      expect(response.body).not.toHaveProperty('password');
+    });
+
+  });
+
+});
 
 describe('Tasks API (e2e)', () => {
   let app: INestApplication;

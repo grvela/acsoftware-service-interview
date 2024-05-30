@@ -2,7 +2,12 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TaskModule } from './modules/task/task.module';
-import { Task } from './modules/task/entities/task.entity';
+import { Task } from './modules/task/task.entity';
+import { KeycloakAuthModule } from './modules/keycloak/auth/auth.module';
+import { KeycloakClientModule } from './modules/keycloak/client/client.module';
+import { KeycloakUsersModule } from './modules/keycloak/users/users.module';
+import { UsersModule } from './modules/users/user.module';
+import { User } from './modules/users/user.entity';
 
 @Module({
   imports: [
@@ -18,12 +23,16 @@ import { Task } from './modules/task/entities/task.entity';
         password: config.get('MYSQL_PASSWORD'),
         database: config.get('MYSQL_DATABASE'),
         port: 3306,
-        entities: [Task],
+        entities: [Task, User],
         synchronize: true
       }),
       inject: [ConfigService]
     }),
-    TaskModule
+    TaskModule,
+    UsersModule,
+    KeycloakAuthModule,
+    KeycloakClientModule,
+    KeycloakUsersModule
   ],
 })
 export class AppModule {}
