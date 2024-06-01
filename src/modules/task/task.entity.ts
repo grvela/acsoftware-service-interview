@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
 import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
 import { TaskStatus, TaskPriority } from './dto/task.enum';
+import { User } from '../users/user.entity';
   
 @Entity()
 export class Task {
@@ -32,4 +33,7 @@ export class Task {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @ManyToOne(() => User, (user) => user.tasks)
+    user: User;
 }

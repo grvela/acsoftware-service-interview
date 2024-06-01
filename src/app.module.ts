@@ -8,6 +8,7 @@ import { KeycloakClientModule } from './modules/keycloak/client/client.module';
 import { KeycloakUsersModule } from './modules/keycloak/users/users.module';
 import { UsersModule } from './modules/users/user.module';
 import { User } from './modules/users/user.entity';
+import { TaskOrderModule } from './modules/task-order/task-order.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { User } from './modules/users/user.entity';
     UsersModule,
     KeycloakAuthModule,
     KeycloakClientModule,
-    KeycloakUsersModule
+    KeycloakUsersModule,
+    TaskOrderModule
   ],
 })
 export class AppModule {}
