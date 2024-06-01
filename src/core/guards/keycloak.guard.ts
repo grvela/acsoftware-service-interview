@@ -20,6 +20,7 @@ export class KeycloakGuard implements CanActivate {
     const introspectResult = await this.kcClientService.introspect(token);
 
     if (introspectResult.active) {
+      request.email = introspectResult.email;
       return true;
     } else {
       throw new UnauthorizedException('Invalid token');

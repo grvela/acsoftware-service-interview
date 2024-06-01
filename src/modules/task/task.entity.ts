@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
 import { TaskStatus, TaskPriority } from './dto/task.enum';
 import { User } from '../users/user.entity';
@@ -28,7 +28,7 @@ export class Task {
     @IsOptional()
     priority: TaskPriority;
 
-    @Column()       
+    @Column({default: 1})       
     position: number;
 
     @CreateDateColumn()
@@ -38,5 +38,6 @@ export class Task {
     updatedAt: Date;
 
     @ManyToOne(() => User, (user) => user.tasks)
+    @JoinColumn({ name: 'user_id' })
     user: User;
 }
