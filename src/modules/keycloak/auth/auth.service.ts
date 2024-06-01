@@ -15,9 +15,6 @@ export class KeycloakAuthService {
   async login(credentials: CredentialsDto) {
     const { email, password } = credentials;
 
-    console.log(email);
-    console.log(password);
-
     const endpoint = `${this.client.server}/realms/${this.client.realm}/protocol/openid-connect/token`;
 
     const { data } = await firstValueFrom(

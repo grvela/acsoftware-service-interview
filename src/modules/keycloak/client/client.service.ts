@@ -36,4 +36,22 @@ export class KeycloakClientService {
 
     return data;
   }
+
+  public async introspect(token: string){
+    const endpoint = `${this.server}/realms/${this.realm}/protocol/openid-connect/token/introspect`;
+
+    const { data } =  await firstValueFrom(
+      this.httpService.post(
+        endpoint,
+        new URLSearchParams({
+          client_id: this.client_id,
+          client_secret: this.client_secret,
+          grant_type: 'client_credentials',
+          token: token
+        }),
+      ),
+    );
+
+    return data;
+  }
 }

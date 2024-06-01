@@ -28,6 +28,9 @@ export class Task {
     @IsOptional()
     priority: TaskPriority;
 
+    @Column()       
+    position: number;
+
     @CreateDateColumn()
     createdAt: Date;
 

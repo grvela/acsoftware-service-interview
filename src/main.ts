@@ -5,6 +5,7 @@ import { AxiosExceptionFilter } from './core/middlewares/axios.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors()
   app.useGlobalPipes(new ValidationPipe());
 
   app.useGlobalFilters(new AxiosExceptionFilter());

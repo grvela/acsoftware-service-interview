@@ -4,6 +4,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TaskStatus } from './dto/task.enum';
 
 @Injectable()
 export class TaskService {
@@ -18,6 +19,50 @@ export class TaskService {
 
   findAll(): Promise<Task[]> {
     return this.taskRepository.find();
+  }
+
+  async findAllByGroup() {
+    const todo_list = await this.taskRepository.find({
+      where: {
+        status: TaskStatus.TO_DO
+      },
+      order: {
+        position: 'ASC'
+      }
+    });
+
+    const in_progress_list = await this.taskRepository.find({
+      where: {
+        status: TaskStatus.IN_PROGRESS
+      },
+      order: {
+        position: 'ASC'
+      }
+    });
+
+    const done_list = await this.taskRepository.find({
+      where: {
+        status: TaskStatus.DONE
+      },
+      order: {
+        position: 'ASC'
+      }
+    });
+
+    return [
+      {
+        title: 'TO DO',
+        items: todo_list
+      },
+      {
+        title: 'IN PROGRESS',
+        items: in_progress_list
+      },
+      {
+        title: 'DONE',
+        items: done_list
+      }
+    ];
   }
 
   async findOne(id: number): Promise<Task> {
