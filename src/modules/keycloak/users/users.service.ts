@@ -17,7 +17,7 @@ export class KeycloakUsersService {
     createKeycloakUserDto: CreateKeycloakUserDTO,
   ): Promise<AxiosResponse> {
     const { access_token } = await this.client.auth();
-
+    console.log(access_token);
     const { email, password } = createKeycloakUserDto;
 
     const endpoint = `${this.client.server}/admin/realms/${this.client.realm}/users`;
